@@ -65,7 +65,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     geolocator.getPositionStream(locationOptions).listen((Position position) {
       if (_idRequisicao != null && _idRequisicao.isNotEmpty) {
-        //Atualiza local do passageiro
+        //Atualiza local do passenger
         UsuarioFirebase.atualizarDadosLocalizacao(
             _idRequisicao, position.latitude, position.longitude);
       } else {
@@ -104,10 +104,10 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     BitmapDescriptor.fromAssetImage(
             ImageConfiguration(devicePixelRatio: pixelRatio),
-            "images/passageiro.png")
+            "images/passenger.png")
         .then((BitmapDescriptor icone) {
       Marker marcadorPassageiro = Marker(
-          markerId: MarkerId("marcador-passageiro"),
+          markerId: MarkerId("marcador-passenger"),
           position: LatLng(local.latitude, local.longitude),
           infoWindow: InfoWindow(title: "Mi ubicacion"),
           icon: icone);
@@ -127,22 +127,22 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
       if (listaEnderecos != null && listaEnderecos.length > 0) {
         Placemark endereco = listaEnderecos[0];
-        Destino destino = Destino();
-        destino.cidade = endereco.administrativeArea;
-        destino.cep = endereco.postalCode;
-        destino.bairro = endereco.subLocality;
-        destino.rua = endereco.thoroughfare;
-        destino.numero = endereco.subThoroughfare;
+        Destino destination = Destino();
+        destination.city = endereco.administrativeArea;
+        destination.zip = endereco.postalCode;
+        destination.neighborhood = endereco.subLocality;
+        destination.street = endereco.thoroughfare;
+        destination.number = endereco.subThoroughfare;
 
-        destino.latitude = endereco.position.latitude;
-        destino.longitude = endereco.position.longitude;
+        destination.latitude = endereco.position.latitude;
+        destination.longitude = endereco.position.longitude;
 
         String enderecoConfirmacao;
-        enderecoConfirmacao = "\n Cidade: " + destino.cidade;
+        enderecoConfirmacao = "\n Cidade: " + destination.city;
         enderecoConfirmacao +=
-            "\n Calle: " + destino.rua + ", " + destino.numero;
-        enderecoConfirmacao += "\n Barrio: " + destino.bairro;
-        enderecoConfirmacao += "\n Cep: " + destino.cep;
+            "\n Calle: " + destination.street + ", " + destination.number;
+        enderecoConfirmacao += "\n Barrio: " + destination.neighborhood;
+        enderecoConfirmacao += "\n Cep: " + destination.zip;
 
         showDialog(
             context: context,
@@ -166,7 +166,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                     ),
                     onPressed: () {
                       //salvar requisicao
-                      _salvarRequisicao(destino);
+                      _salvarRequisicao(destination);
 
                       Navigator.pop(contex);
                     },
@@ -178,33 +178,33 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     }
   }
 
-  _salvarRequisicao(Destino destino) async {
-    Usuario passageiro = await UsuarioFirebase.getDadosUsuarioLogado();
-    passageiro.latitude = _localPassageiro.latitude;
-    passageiro.longitude = _localPassageiro.longitude;
+  _salvarRequisicao(Destino destination) async {
+    Usuario passenger = await UsuarioFirebase.getDadosUsuarioLogado();
+    passenger.latitude = _localPassageiro.latitude;
+    passenger.longitude = _localPassageiro.longitude;
 
     Requisicao requisicao = Requisicao();
-    requisicao.destino = destino;
-    requisicao.passageiro = passageiro;
-    requisicao.status = StatusRequisicao.AGUARDANDO;
+    requisicao.destination = destination;
+    requisicao.passenger = passenger;
+    requisicao.status = StatusRequisicao.WAITING;
 
     Firestore db = Firestore.instance;
 
     //salvar requisição
     db
-        .collection("requisicoes")
+        .collection("requests")
         .document(requisicao.id)
         .setData(requisicao.toMap());
 
     //Salvar requisição ativa
     Map<String, dynamic> dadosRequisicaoAtiva = {};
-    dadosRequisicaoAtiva["id_requisicao"] = requisicao.id;
-    dadosRequisicaoAtiva["id_usuario"] = passageiro.idUsuario;
-    dadosRequisicaoAtiva["status"] = StatusRequisicao.AGUARDANDO;
+    dadosRequisicaoAtiva["id_request"] = requisicao.id;
+    dadosRequisicaoAtiva["id_usuario"] = passenger.idUsuario;
+    dadosRequisicaoAtiva["status"] = StatusRequisicao.WAITING;
 
     db
-        .collection("requisicao_ativa")
-        .document(passageiro.idUsuario)
+        .collection("active_request")
+        .document(passenger.idUsuario)
         .setData(dadosRequisicaoAtiva);
 
     //Adicionar listener requisicao
@@ -246,8 +246,8 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       _cancelarUber();
     });
 
-    double passageiroLat = _dadosRequisicao["passageiro"]["latitude"];
-    double passageiroLon = _dadosRequisicao["passageiro"]["longitude"];
+    double passageiroLat = _dadosRequisicao["passenger"]["latitude"];
+    double passageiroLon = _dadosRequisicao["passenger"]["longitude"];
     Position position =
         Position(latitude: passageiroLat, longitude: passageiroLon);
     _exibirMarcadorPassageiro(position);
@@ -261,19 +261,19 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     _alterarBotaoPrincipal("Conductor en camino", Colors.grey, () {});
 
-    double latitudeDestino = _dadosRequisicao["passageiro"]["latitude"];
-    double longitudeDestino = _dadosRequisicao["passageiro"]["longitude"];
+    double latitudeDestino = _dadosRequisicao["passenger"]["latitude"];
+    double longitudeDestino = _dadosRequisicao["passenger"]["longitude"];
 
-    double latitudeOrigem = _dadosRequisicao["motorista"]["latitude"];
-    double longitudeOrigem = _dadosRequisicao["motorista"]["longitude"];
+    double latitudeOrigem = _dadosRequisicao["driver"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["driver"]["longitude"];
 
     Marcador marcadorOrigem = Marcador(LatLng(latitudeOrigem, longitudeOrigem),
-        "images/motorista.png", "Local motorista");
+        "images/driver.png", "Local driver");
 
     Marcador marcadorDestino = Marcador(
         LatLng(latitudeDestino, longitudeDestino),
-        "images/passageiro.png",
-        "Local destino");
+        "images/passenger.png",
+        "Local destination");
 
     _exibirCentralizarDoisMarcadores(marcadorOrigem, marcadorDestino);
   }
@@ -282,19 +282,19 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     _exibirCaixaEnderecoDestino = false;
     _alterarBotaoPrincipal("De viaje", Colors.grey, null);
 
-    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
-    double longitudeDestino = _dadosRequisicao["destino"]["longitude"];
+    double latitudeDestino = _dadosRequisicao["destination"]["latitude"];
+    double longitudeDestino = _dadosRequisicao["destination"]["longitude"];
 
-    double latitudeOrigem = _dadosRequisicao["motorista"]["latitude"];
-    double longitudeOrigem = _dadosRequisicao["motorista"]["longitude"];
+    double latitudeOrigem = _dadosRequisicao["driver"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["driver"]["longitude"];
 
     Marcador marcadorOrigem = Marcador(LatLng(latitudeOrigem, longitudeOrigem),
-        "images/motorista.png", "Local motorista");
+        "images/driver.png", "Local driver");
 
     Marcador marcadorDestino = Marcador(
         LatLng(latitudeDestino, longitudeDestino),
-        "images/destino.png",
-        "Local destino");
+        "images/destination.png",
+        "Local destination");
 
     _exibirCentralizarDoisMarcadores(marcadorOrigem, marcadorDestino);
   }
@@ -337,11 +337,11 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
   _statusFinalizada() async {
     //Calcula valor da corrida
-    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
-    double longitudeDestino = _dadosRequisicao["destino"]["longitude"];
+    double latitudeDestino = _dadosRequisicao["destination"]["latitude"];
+    double longitudeDestino = _dadosRequisicao["destination"]["longitude"];
 
-    double latitudeOrigem = _dadosRequisicao["origem"]["latitude"];
-    double longitudeOrigem = _dadosRequisicao["origem"]["longitude"];
+    double latitudeOrigem = _dadosRequisicao["origin"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["origin"]["longitude"];
 
     double distanciaEmMetros = await Geolocator().distanceBetween(
         latitudeOrigem, longitudeOrigem, latitudeDestino, longitudeDestino);
@@ -352,7 +352,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     //6 é o valor cobrado por KM
     double valorViagem = distanciaKm * 6;
 
-    //Formatar valor viagem
+    //Formatar valor travel
     var f = new NumberFormat("#,##0.00", "pt_BR");
     var valorViagemFormatado = f.format(valorViagem);
 
@@ -362,7 +362,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     _marcadores = {};
     Position position =
         Position(latitude: latitudeDestino, longitude: longitudeDestino);
-    _exibirMarcador(position, "images/destino.png", "Destino");
+    _exibirMarcador(position, "images/destination.png", "Destino");
 
     CameraPosition cameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude), zoom: 19);
@@ -447,10 +447,10 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     Firestore db = Firestore.instance;
     db
-        .collection("requisicoes")
+        .collection("requests")
         .document(_idRequisicao)
-        .updateData({"status": StatusRequisicao.CANCELADA}).then((_) {
-      db.collection("requisicao_ativa").document(firebaseUser.uid).delete();
+        .updateData({"status": StatusRequisicao.CANCELED}).then((_) {
+      db.collection("active_request").document(firebaseUser.uid).delete();
     });
   }
 
@@ -458,14 +458,12 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
 
     Firestore db = Firestore.instance;
-    DocumentSnapshot documentSnapshot = await db
-        .collection("requisicao_ativa")
-        .document(firebaseUser.uid)
-        .get();
+    DocumentSnapshot documentSnapshot =
+        await db.collection("active_request").document(firebaseUser.uid).get();
 
     if (documentSnapshot.data != null) {
       Map<String, dynamic> dados = documentSnapshot.data;
-      _idRequisicao = dados["id_requisicao"];
+      _idRequisicao = dados["id_request"];
       _adicionarListenerRequisicao(_idRequisicao);
     } else {
       _statusUberNaoChamado();
@@ -475,7 +473,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   _adicionarListenerRequisicao(String idRequisicao) async {
     Firestore db = Firestore.instance;
     _streamSubscriptionRequisicoes = await db
-        .collection("requisicoes")
+        .collection("requests")
         .document(idRequisicao)
         .snapshots()
         .listen((snapshot) {
@@ -483,22 +481,22 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
         Map<String, dynamic> dados = snapshot.data;
         _dadosRequisicao = dados;
         String status = dados["status"];
-        _idRequisicao = dados["id_requisicao"];
+        _idRequisicao = dados["id_request"];
 
         switch (status) {
-          case StatusRequisicao.AGUARDANDO:
+          case StatusRequisicao.WAITING:
             _statusAguardando();
             break;
-          case StatusRequisicao.A_CAMINHO:
+          case StatusRequisicao.ON_WAY:
             _statusACaminho();
             break;
-          case StatusRequisicao.VIAGEM:
+          case StatusRequisicao.TRAVEL:
             _statusEmViagem();
             break;
-          case StatusRequisicao.FINALIZADA:
+          case StatusRequisicao.FINISHED:
             _statusFinalizada();
             break;
-          case StatusRequisicao.CONFIRMADA:
+          case StatusRequisicao.CONFIRMED:
             _statusConfirmada();
             break;
         }
@@ -609,7 +607,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                                   color: Colors.black,
                                 ),
                               ),
-                              hintText: "Digite o destino",
+                              hintText: "Digite o destination",
                               border: InputBorder.none,
                               contentPadding:
                                   EdgeInsets.only(left: 15, top: 16)),

@@ -35,8 +35,8 @@ class _PainelMotoristaState extends State<PainelMotorista> {
 
   Stream<QuerySnapshot> _adicionarListenerRequisicoes() {
     final stream = db
-        .collection("requisicoes")
-        .where("status", isEqualTo: StatusRequisicao.AGUARDANDO)
+        .collection("requests")
+        .where("status", isEqualTo: StatusRequisicao.WAITING)
         .snapshots();
 
     stream.listen((dados) {
@@ -50,7 +50,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
 
     //Recupera requisicao ativa
     DocumentSnapshot documentSnapshot = await db
-        .collection("requisicao_ativa_motorista")
+        .collection("active_driver_request")
         .document(firebaseUser.uid)
         .get();
 
@@ -59,7 +59,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     if (dadosRequisicao == null) {
       _adicionarListenerRequisicoes();
     } else {
-      String idRequisicao = dadosRequisicao["id_requisicao"];
+      String idRequisicao = dadosRequisicao["id_request"];
       Navigator.pushReplacementNamed(context, "/corrida",
           arguments: idRequisicao);
     }
@@ -70,7 +70,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     super.initState();
 
     /*
-    Recupera requisicao ativa para verificar se motorista está
+    Recupera requisicao ativa para verificar se driver está
     atendendo alguma requisição e envia ele para tela de corrida
     */
     _recuperaRequisicaoAtivaMotorista();
@@ -136,18 +136,18 @@ class _PainelMotoristaState extends State<PainelMotorista> {
                               color: Colors.grey,
                             ),
                         itemBuilder: (context, indice) {
-                          List<DocumentSnapshot> requisicoes =
+                          List<DocumentSnapshot> requests =
                               querySnapshot.documents.toList();
-                          DocumentSnapshot item = requisicoes[indice];
+                          DocumentSnapshot item = requests[indice];
 
                           String idRequisicao = item["id"];
-                          String nomePassageiro = item["passageiro"]["nome"];
-                          String rua = item["destino"]["rua"];
-                          String numero = item["destino"]["numero"];
+                          String nomePassageiro = item["passenger"]["name"];
+                          String street = item["destination"]["street"];
+                          String number = item["destination"]["number"];
 
                           return ListTile(
                             title: Text(nomePassageiro),
-                            subtitle: Text("destino: $rua, $numero"),
+                            subtitle: Text("destination: $street, $number"),
                             onTap: () {
                               Navigator.pushNamed(context, "/corrida",
                                   arguments: idRequisicao);

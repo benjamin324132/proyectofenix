@@ -1,8 +1,8 @@
 class Usuario {
-  String _idUsuario;
-  String _nome;
+  String _idUser;
+  String _name;
   String _email;
-  String _senha;
+  String _password;
   String _tipoUsuario;
 
   double _latitude;
@@ -19,7 +19,7 @@ class Usuario {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       "idUsuario": this.idUsuario,
-      "nome": this.nome,
+      "name": this.name,
       "email": this.email,
       "tipoUsuario": this.tipoUsuario,
       "latitude": this.latitude,
@@ -30,7 +30,7 @@ class Usuario {
   }
 
   String verificaTipoUsuario(bool tipoUsuario) {
-    return tipoUsuario ? "motorista" : "passageiro";
+    return tipoUsuario ? "driver" : "passenger";
   }
 
   String get tipoUsuario => _tipoUsuario;
@@ -39,10 +39,10 @@ class Usuario {
     _tipoUsuario = value;
   }
 
-  String get senha => _senha;
+  String get senha => _password;
 
   set senha(String value) {
-    _senha = value;
+    _password = value;
   }
 
   String get email => _email;
@@ -51,16 +51,16 @@ class Usuario {
     _email = value;
   }
 
-  String get nome => _nome;
+  String get name => _name;
 
-  set nome(String value) {
-    _nome = value;
+  set name(String value) {
+    _name = value;
   }
 
-  String get idUsuario => _idUsuario;
+  String get idUsuario => _idUser;
 
   set idUsuario(String value) {
-    _idUsuario = value;
+    _idUser = value;
   }
 
   double get longitude => _longitude;

@@ -15,18 +15,18 @@ class UsuarioFirebase {
     Firestore db = Firestore.instance;
 
     DocumentSnapshot snapshot =
-        await db.collection("usuarios").document(idUsuario).get();
+        await db.collection("users").document(idUsuario).get();
 
     Map<String, dynamic> dados = snapshot.data;
     String tipoUsuario = dados["tipoUsuario"];
     String email = dados["email"];
-    String nome = dados["nome"];
+    String name = dados["name"];
 
     Usuario usuario = Usuario();
     usuario.idUsuario = idUsuario;
     usuario.tipoUsuario = tipoUsuario;
     usuario.email = email;
-    usuario.nome = nome;
+    usuario.name = name;
 
     return usuario;
   }
@@ -35,13 +35,13 @@ class UsuarioFirebase {
       String idRequisicao, double lat, double lon) async {
     Firestore db = Firestore.instance;
 
-    Usuario motorista = await getDadosUsuarioLogado();
-    motorista.latitude = lat;
-    motorista.longitude = lon;
+    Usuario driver = await getDadosUsuarioLogado();
+    driver.latitude = lat;
+    driver.longitude = lon;
 
     db
-        .collection("requisicoes")
+        .collection("requests")
         .document(idRequisicao)
-        .updateData({"motorista": motorista.toMap()});
+        .updateData({"driver": driver.toMap()});
   }
 }
