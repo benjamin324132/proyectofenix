@@ -1,9 +1,9 @@
 class Destino {
-  String _rua;
+  String _street;
   String _numero;
-  String _cidade;
-  String _bairro;
-  String _cep;
+  String _city;
+  String _neighborhood;
+  String _zip;
 
   double _latitude;
   double _longitude;
@@ -22,33 +22,33 @@ class Destino {
     _latitude = value;
   }
 
-  String get cep => _cep;
+  String get zip => _zip;
 
-  set cep(String value) {
-    _cep = value;
+  set zip(String value) {
+    _zip = value;
   }
 
-  String get bairro => _bairro;
+  String get neighborhood => _neighborhood;
 
-  set bairro(String value) {
-    _bairro = value;
+  set neighborhood(String value) {
+    _neighborhood = value;
   }
 
-  String get cidade => _cidade;
+  String get city => _city;
 
-  set cidade(String value) {
-    _cidade = value;
+  set city(String value) {
+    _city = value;
   }
 
-  String get numero => _numero;
+  String get number => _numero;
 
-  set numero(String value) {
+  set number(String value) {
     _numero = value;
   }
 
-  String get rua => _rua;
+  String get street => _street;
 
-  set rua(String value) {
-    _rua = value;
+  set street(String value) {
+    _street = value;
   }
 }

@@ -17,16 +17,16 @@ class _CadastroState extends State<Cadastro> {
 
   _validarCampos() {
     //Recuperar dados dos campos
-    String nome = _controllerNome.text;
+    String name = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
 
     //validar campos
-    if (nome.isNotEmpty) {
+    if (name.isNotEmpty) {
       if (email.isNotEmpty && email.contains("@")) {
         if (senha.isNotEmpty && senha.length > 6) {
           Usuario usuario = Usuario();
-          usuario.nome = nome;
+          usuario.name = name;
           usuario.email = email;
           usuario.senha = senha;
           usuario.tipoUsuario = usuario.verificaTipoUsuario(_tipoUsuario);
@@ -58,19 +58,19 @@ class _CadastroState extends State<Cadastro> {
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
       db
-          .collection("usuarios")
+          .collection("users")
           .document(firebaseUser.user.uid)
           .setData(usuario.toMap());
 
       //redireciona para o painel, de acordo com o tipoUsuario
       switch (usuario.tipoUsuario) {
-        case "motorista":
+        case "driver":
           Navigator.pushNamedAndRemoveUntil(
-              context, "/painel-motorista", (_) => false);
+              context, "/painel-driver", (_) => false);
           break;
-        case "passageiro":
+        case "passenger":
           Navigator.pushNamedAndRemoveUntil(
-              context, "/painel-passageiro", (_) => false);
+              context, "/painel-passenger", (_) => false);
           break;
       }
     }).catchError((error) {

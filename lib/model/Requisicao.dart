@@ -6,61 +6,61 @@ class Requisicao {
   String _id;
   String _status;
   Usuario _passageiro;
-  Usuario _motorista;
+  Usuario _driver;
   Destino _destino;
 
   Requisicao() {
     Firestore db = Firestore.instance;
 
-    DocumentReference ref = db.collection("requisicoes").document();
+    DocumentReference ref = db.collection("requests").document();
     this.id = ref.documentID;
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> dadosPassageiro = {
-      "nome": this.passageiro.nome,
-      "email": this.passageiro.email,
-      "tipoUsuario": this.passageiro.tipoUsuario,
-      "idUsuario": this.passageiro.idUsuario,
-      "latitude": this.passageiro.latitude,
-      "longitude": this.passageiro.longitude,
+      "name": this.passenger.name,
+      "email": this.passenger.email,
+      "tipoUsuario": this.passenger.tipoUsuario,
+      "idUsuario": this.passenger.idUsuario,
+      "latitude": this.passenger.latitude,
+      "longitude": this.passenger.longitude,
     };
 
     Map<String, dynamic> dadosDestino = {
-      "rua": this.destino.rua,
-      "numero": this.destino.numero,
-      "bairro": this.destino.bairro,
-      "cep": this.destino.cep,
-      "latitude": this.destino.latitude,
-      "longitude": this.destino.longitude,
+      "street": this.destination.street,
+      "number": this.destination.number,
+      "neighborhood": this.destination.neighborhood,
+      "zip": this.destination.zip,
+      "latitude": this.destination.latitude,
+      "longitude": this.destination.longitude,
     };
 
     Map<String, dynamic> dadosRequisicao = {
       "id": this.id,
       "status": this.status,
-      "passageiro": dadosPassageiro,
-      "motorista": null,
-      "destino": dadosDestino,
+      "passenger": dadosPassageiro,
+      "driver": null,
+      "destination": dadosDestino,
     };
 
     return dadosRequisicao;
   }
 
-  Destino get destino => _destino;
+  Destino get destination => _destino;
 
-  set destino(Destino value) {
+  set destination(Destino value) {
     _destino = value;
   }
 
-  Usuario get motorista => _motorista;
+  Usuario get driver => _driver;
 
-  set motorista(Usuario value) {
-    _motorista = value;
+  set driver(Usuario value) {
+    _driver = value;
   }
 
-  Usuario get passageiro => _passageiro;
+  Usuario get passenger => _passageiro;
 
-  set passageiro(Usuario value) {
+  set passenger(Usuario value) {
     _passageiro = value;
   }
 

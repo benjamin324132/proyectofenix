@@ -62,7 +62,7 @@ class _HomeState extends State<Home> {
     Firestore db = Firestore.instance;
 
     DocumentSnapshot snapshot =
-        await db.collection("usuarios").document(idUsuario).get();
+        await db.collection("users").document(idUsuario).get();
 
     Map<String, dynamic> dados = snapshot.data;
     String tipoUsuario = dados["tipoUsuario"];
@@ -72,11 +72,11 @@ class _HomeState extends State<Home> {
     });
 
     switch (tipoUsuario) {
-      case "motorista":
-        Navigator.pushReplacementNamed(context, "/painel-motorista");
+      case "driver":
+        Navigator.pushReplacementNamed(context, "/painel-driver");
         break;
-      case "passageiro":
-        Navigator.pushReplacementNamed(context, "/painel-passageiro");
+      case "passenger":
+        Navigator.pushReplacementNamed(context, "/painel-passenger");
         break;
     }
   }
